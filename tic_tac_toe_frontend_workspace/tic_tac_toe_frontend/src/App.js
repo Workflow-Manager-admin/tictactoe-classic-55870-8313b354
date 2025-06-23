@@ -180,17 +180,18 @@ function TicTacToeGame() {
 
   return (
     <div className="ttt-container">
-      <div className="ttt-header">
-        <h2 className="title" style={{ marginBottom: 8 }}>Tic Tac Toe</h2>
-        <div className="description" style={{ marginBottom: 24 }}>
+      {/* Score/Status bar - now very top, centered */}
+      <GameStatus
+        status={gameState.status}
+        winner={gameState.winner}
+        currentPlayer={gameState.current_player}
+        msg={gameState.msg}
+      />
+      <div className="ttt-header" style={{marginBottom: 8}}>
+        <h2 className="title" style={{marginBottom: 0, fontSize: '2.1rem', letterSpacing: "1px"}}>Tic Tac Toe</h2>
+        <div className="description" style={{marginBottom: 10,fontSize:"1rem"}}>
           Try to win by getting three in a row!
         </div>
-        <GameStatus
-          status={gameState.status}
-          winner={gameState.winner}
-          currentPlayer={gameState.current_player}
-          msg={gameState.msg}
-        />
       </div>
       <TicTacToeBoard
         board={gameState.board}
@@ -201,7 +202,7 @@ function TicTacToeGame() {
       <div className="ttt-controls">
         <NewGameButton onClick={() => startNewGame("X")} />
       </div>
-      {loading && <div style={{color:"#888",marginTop:10}}>Loading...</div>}
+      {loading && <div style={{color:"#888",marginTop:8}}>Loading...</div>}
     </div>
   );
 }

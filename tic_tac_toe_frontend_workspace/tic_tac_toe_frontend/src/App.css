@@ -1,14 +1,20 @@
 :root {
-  --base-light: #00ffff;
-  --base-dark: #00008b;
+  --base-dark: #191c31;
+  --base-light: #3F51B5;
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.09);
 
-  /* Tic Tac Toe custom colors */
+  /* Theme colors */
   --ttt-primary: #3F51B5;
   --ttt-secondary: #FFC107;
   --ttt-accent: #E91E63;
+  --ttt-bg: #23254a;
+  --ttt-card-bg: rgba(33,37,63,0.98);
+  --ttt-card-border: #3f51b520;
+  --ttt-cell-bg: #fff;
+  --ttt-cell-hover-bg: #f5f8fd;
+  --ttt-cell-win-bg: #ffe3f0;
 }
 
 body {
@@ -24,6 +30,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--base-dark);
 }
 
 .navbar {
@@ -113,129 +120,179 @@ body {
 }
 
 /* Tic Tac Toe board and UI styles */
+/* Card-style play area, responsive and modern */
 .ttt-container {
-  background: rgba(31, 34, 76, 0.96);
-  border-radius: 12px;
-  box-shadow: 0 2px 16px 0 rgba(36, 72, 140, 0.18);
-  padding: 36px 20px 32px 20px;
-  max-width: 380px;
+  background: var(--ttt-card-bg);
+  border-radius: 18px;
+  box-shadow: 0 4px 32px 3px rgba(34,54,100,0.15);
+  border: 1.5px solid var(--ttt-card-border);
+  padding: 30px 24px 26px 24px;
+  max-width: 410px;
   margin: 0 auto;
+  margin-top: 36px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .ttt-header {
-  margin-bottom: 24px;
+  margin-bottom: 14px;
   text-align: center;
+  width: 100%;
 }
 
+
+/* Board area */
 .ttt-board {
   display: grid;
   grid-template-columns: repeat(3, 64px);
   grid-template-rows: repeat(3, 64px);
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: 13px;
+  margin-bottom: 16px;
   justify-items: center;
+  align-items: center;
+  align-content: center;
 }
 
 .ttt-cell {
   width: 64px;
   height: 64px;
   font-size: 2.2rem;
-  font-family: inherit;
   color: var(--ttt-primary);
-  background: #fff;
-  border: 2px solid var(--ttt-accent);
-  border-radius: 10px;
+  background: var(--ttt-cell-bg);
+  border: 2.5px solid var(--ttt-accent);
+  border-radius: 11px;
   cursor: pointer;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.13s, border 0.13s;
-  box-shadow: 0 0.5px 8px 0 rgba(36, 72, 140, 0.10);
+  transition: background 0.14s, border 0.15s, color 0.10s;
+  box-shadow: 0 0.5px 8px 0 rgba(63, 81, 181, 0.13);
+  outline: none;
 }
 .ttt-cell:disabled {
   background: #f2f2fb;
   color: #bbb;
   cursor: not-allowed;
+  opacity: 0.85;
 }
 .ttt-cell:hover:enabled {
   border-color: var(--ttt-secondary);
-  background: #fdffe4;
+  background: var(--ttt-cell-hover-bg);
+  color: var(--ttt-accent);
 }
 
+/* Score/status at the very top of card */
 .ttt-status {
-  font-size: 1.18rem;
-  margin-bottom: 12px;
+  font-size: 1.25rem;
+  margin: 0 auto 18px auto;
   color: var(--ttt-primary);
-  font-weight: 600;
-  min-height: 24px;
+  font-weight: 650;
+  min-height: 32px;
+  background: #f5f8fd;
+  border-radius: 8px;
+  padding: 6px 14px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0.5px 5px 0 rgba(70,55,120,0.06);
+  border: 1.1px solid var(--ttt-card-border);
+  width: fit-content;
 }
 
 .ttt-status-win {
   color: var(--ttt-accent);
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.28rem;
   background: #fff0fa;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 7px;
+  padding: 7px 15px;
   letter-spacing: 1px;
+  border: 1.6px solid var(--ttt-accent);
 }
 .ttt-status-draw {
   color: var(--ttt-secondary);
   font-weight: bold;
-  background: #fffde4;
-  border-radius: 6px;
-  padding: 6px 10px;
+  background: #fffde8;
+  border-radius: 7px;
+  padding: 7px 15px;
+  border: 1.6px solid var(--ttt-secondary);
 }
 
 .ttt-win-cell {
   border-color: var(--ttt-accent) !important;
-  background: #fff0fa !important;
-  box-shadow: 0 0 8px 0 var(--ttt-accent);
+  background: var(--ttt-cell-win-bg) !important;
+  box-shadow: 0 0 14px 2px var(--ttt-accent), 0 0 6px 0 var(--ttt-primary);
 }
 
 .ttt-controls {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 14px;
+  margin-top: 18px;
+  margin-bottom: 2px;
+  gap: 12px;
+  min-height: 54px;
 }
 
+/* Large, vibrant action button */
 .ttt-newgame {
-  background: var(--ttt-accent);
+  background: linear-gradient(90deg,var(--ttt-accent), var(--ttt-primary));
   color: #fff;
-  font-weight: bold;
+  font-weight: 700;
   border: none;
-  border-radius: 5px;
-  transition: background-color 0.2s;
-  margin-top: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 var(--ttt-accent)11;
+  padding: 11px 28px;
+  font-size: 1.09rem;
+  letter-spacing: 0.7px;
+  margin-top: 0;
+  margin-bottom: 0;
+  transition: background 0.15s, color 0.13s;
 }
 .ttt-newgame:hover {
-  background: #c2185b;
+  background: linear-gradient(90deg, #c2185b, var(--ttt-primary));
+  color: #fff7ee;
 }
 
 /* Responsive adjustments for mobile */
 @media (max-width: 480px) {
   .ttt-container {
-    padding: 16px 5px;
-    max-width: 98vw;
+    padding: 13px 2px 13px 2px;
+    max-width: 100vw;
+    margin-top: 24px;
+  }
+  .ttt-header .title {
+    font-size: 1.9rem !important;
+  }
+  .ttt-status,
+  .ttt-status-win,
+  .ttt-status-draw {
+    font-size: 1rem!important;
+    padding: 7px 6px !important;
   }
   .ttt-board {
-    grid-template-columns: repeat(3, 44px);
-    grid-template-rows: repeat(3, 44px);
-    gap: 8px;
+    grid-template-columns: repeat(3, 40px);
+    grid-template-rows: repeat(3, 40px);
+    gap: 7px;
+    margin-bottom: 8px;
   }
   .ttt-cell {
-    width: 44px;
-    height: 44px;
-    font-size: 1.35rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.13rem;
+  }
+  .ttt-controls {
+    min-height: 44px;
+  }
+  .ttt-newgame {
+    padding: 8px 16px;
+    font-size: 0.97rem;
   }
 }
 
 /* For centered play area when board is by itself */
 body, .app, main, .container {
   min-height: 100vh;
+  width: 100vw;
 }
