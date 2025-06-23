@@ -174,6 +174,29 @@ body {
   min-height: 24px;
 }
 
+.ttt-status-win {
+  color: var(--ttt-accent);
+  font-weight: bold;
+  font-size: 1.3rem;
+  background: #fff0fa;
+  border-radius: 6px;
+  padding: 6px 10px;
+  letter-spacing: 1px;
+}
+.ttt-status-draw {
+  color: var(--ttt-secondary);
+  font-weight: bold;
+  background: #fffde4;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.ttt-win-cell {
+  border-color: var(--ttt-accent) !important;
+  background: #fff0fa !important;
+  box-shadow: 0 0 8px 0 var(--ttt-accent);
+}
+
 .ttt-controls {
   display: flex;
   justify-content: center;

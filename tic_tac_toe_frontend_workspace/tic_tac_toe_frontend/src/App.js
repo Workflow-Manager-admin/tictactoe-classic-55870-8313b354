@@ -1,21 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
+// Utility: API base. Assuming backend hosted at :3001, adjust if proxied.
+const API_BASE = "http://localhost:3001";
+
 // PUBLIC_INTERFACE
-function TicTacToeBoard({ board, onCellClick, disabled }) {
-  /** 
+function TicTacToeBoard({ board, onCellClick, disabled, winLine }) {
+  /**
    * Displays the Tic Tac Toe board as a 3x3 grid.
-   * @param {Array} board - 2D array representing the game board.
-   * @param {Function} onCellClick - Handler for clicking a cell.
-   * @param {Boolean} disabled - If true, disables input.
+   * Highlights winLine if provided.
+   * @param {Array} board - 2D array of board state.
+   * @param {Function} onCellClick
+   * @param {Boolean} disabled
+   * @param {Array|null} winLine - Array of [row, col] indices for win highlight, or null.
    */
+  const isWinCell = (rowIdx, colIdx) => {
+    if (!winLine) return false;
+    return winLine.some(([r, c]) => r === rowIdx && c === colIdx);
+  };
   return (
     <div className="ttt-board">
       {board.map((row, rowIdx) =>
         row.map((cell, colIdx) => (
           <button
             key={`${rowIdx}-${colIdx}`}
-            className="ttt-cell"
+            className={`ttt-cell${isWinCell(rowIdx, colIdx) ? " ttt-win-cell" : ""}`}
             onClick={() => onCellClick(rowIdx, colIdx)}
             disabled={disabled || cell !== ""}
             aria-label={`Row ${rowIdx + 1}, Col ${colIdx + 1}, ${cell || "empty"}`}
@@ -29,23 +38,30 @@ function TicTacToeBoard({ board, onCellClick, disabled }) {
 }
 
 // PUBLIC_INTERFACE
-function GameStatus({ status, winner, currentPlayer }) {
+function GameStatus({ status, winner, currentPlayer, msg }) {
   /**
-   * Displays a status message (game ongoing, win, tie).
-   * @param {String} status - "playing", "won", "draw"
-   * @param {String} winner - "X", "O", or null
-   * @param {String} currentPlayer - "X" or "O"
+   * Displays status message.
+   * @param {String} status "playing", "won", "draw"
+   * @param {String} winner
+   * @param {String} currentPlayer
+   * @param {String} msg - backend-provided status message
    */
   let message = "";
-  if (status === "won") message = `Winner: ${winner}`;
-  else if (status === "draw") message = "It's a draw!";
-  else message = `Current Player: ${currentPlayer}`;
-  return <div className="ttt-status">{message}</div>;
+  if (status === "won")
+    message = msg || `🎉 Winner: ${winner}`;
+  else if (status === "draw")
+    message = msg || "🤝 It's a draw!";
+  else
+    message = msg || `Current Player: ${currentPlayer}`;
+  const statusClass = status === "won" ? "ttt-status-win"
+                      : status === "draw" ? "ttt-status-draw"
+                      : "";
+  return <div className={`ttt-status ${statusClass}`}>{message}</div>;
 }
 
 // PUBLIC_INTERFACE
 function NewGameButton({ onClick }) {
-  /** Button to start a new game */
+  /** Button to start new game */
   return (
     <button className="btn btn-large ttt-newgame" onClick={onClick}>
       New Game
@@ -53,18 +69,9 @@ function NewGameButton({ onClick }) {
   );
 }
 
-// Returns a 3x3 array of empty cells
-function getInitialBoard() {
-  return [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ];
-}
-
-// Check winner and status
-function calculateGameStatus(board) {
-  // Rows, columns, diagonals
+// Find the win line (helper for win highlight).
+function getWinLine(board, winner) {
+  if (!winner) return null;
   const lines = [
     // Rows
     [[0,0],[0,1],[0,2]],
@@ -79,47 +86,97 @@ function calculateGameStatus(board) {
     [[0,2],[1,1],[2,0]],
   ];
   for (const line of lines) {
-    const [a,b,c] = line;
+    const [[a1,a2],[b1,b2],[c1,c2]] = line;
     if (
-      board[a[0]][a[1]] &&
-      board[a[0]][a[1]] === board[b[0]][b[1]] &&
-      board[a[0]][a[1]] === board[c[0]][c[1]]
-    ) {
-      return { status: "won", winner: board[a[0]][a[1]] };
-    }
+      board[a1][a2] === winner &&
+      board[b1][b2] === winner &&
+      board[c1][c2] === winner
+    ) return line;
   }
-  // Check for draw (no empty cells left)
-  const isDraw = board.flat().every(cell => cell !== "");
-  if (isDraw) return { status: "draw", winner: null };
-  // Game ongoing
-  return { status: "playing", winner: null };
+  return null;
 }
 
 // PUBLIC_INTERFACE
 function TicTacToeGame() {
   /**
-   * Main game state for Tic Tac Toe UI.
-   * Handles the board, player turn, game status, and controls.
+   * Main game logic: interacts with backend for state.
+   * Handles board state, player, game status, winner/draw, controls.
    */
 
-  const [board, setBoard] = useState(getInitialBoard());
-  const [currentPlayer, setCurrentPlayer] = useState("X");
-  const { status, winner } = calculateGameStatus(board);
+  const [gameState, setGameState] = useState({
+    board: [["", "", ""],[ "", "", ""],[ "", "", ""]],
+    current_player: "X",
+    status: "playing",
+    winner: null,
+    msg: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  // Handle user move
-  const handleCellClick = (rowIdx, colIdx) => {
-    if (board[rowIdx][colIdx] !== "" || status !== "playing") return;
-    const newBoard = board.map(row => [...row]);
-    newBoard[rowIdx][colIdx] = currentPlayer;
-    setBoard(newBoard);
-    setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-  };
+  // Fetch game state
+  async function fetchState() {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/state`);
+      const data = await res.json();
+      setGameState(data);
+    } catch (e) {
+      setGameState((gs) => ({ ...gs, msg: "Backend unavailable." }));
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  // Start a new game
-  const handleNewGame = () => {
-    setBoard(getInitialBoard());
-    setCurrentPlayer("X");
-  };
+  // Start new game (backend)
+  async function startNewGame(player = "X") {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player }),
+      });
+      const data = await res.json();
+      setGameState(data);
+    } catch (e) {
+      setGameState((gs) => ({ ...gs, msg: "Could not start game." }));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Make a move
+  async function handleCellClick(rowIdx, colIdx) {
+    if (
+      loading ||
+      gameState.status !== "playing" ||
+      gameState.board[rowIdx][colIdx] !== ""
+    )
+      return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/move`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ row: rowIdx, col: colIdx }),
+      });
+      const data = await res.json();
+      setGameState(data);
+    } catch (e) {
+      setGameState((gs) => ({ ...gs, msg: "Move failed." }));
+    }
+    setLoading(false);
+  }
+
+  // On mount, fetch state or start a new game if backend empty
+  useEffect(() => {
+    fetchState();
+    // eslint-disable-next-line
+  }, []);
+
+  // Optionally: highlight winner cells
+  const winLine = (gameState.status === "won")
+    ? getWinLine(gameState.board, gameState.winner)
+    : null;
 
   return (
     <div className="ttt-container">
@@ -128,16 +185,23 @@ function TicTacToeGame() {
         <div className="description" style={{ marginBottom: 24 }}>
           Try to win by getting three in a row!
         </div>
-        <GameStatus status={status} winner={winner} currentPlayer={currentPlayer} />
+        <GameStatus
+          status={gameState.status}
+          winner={gameState.winner}
+          currentPlayer={gameState.current_player}
+          msg={gameState.msg}
+        />
       </div>
       <TicTacToeBoard
-        board={board}
+        board={gameState.board}
         onCellClick={handleCellClick}
-        disabled={status !== "playing"}
+        disabled={gameState.status !== "playing" || loading}
+        winLine={winLine}
       />
       <div className="ttt-controls">
-        <NewGameButton onClick={handleNewGame} />
+        <NewGameButton onClick={() => startNewGame("X")} />
       </div>
+      {loading && <div style={{color:"#888",marginTop:10}}>Loading...</div>}
     </div>
   );
 }
