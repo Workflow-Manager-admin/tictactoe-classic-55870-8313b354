@@ -4,6 +4,11 @@
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --border-color: rgba(255, 255, 255, 0.1);
+
+  /* Tic Tac Toe custom colors */
+  --ttt-primary: #3F51B5;
+  --ttt-secondary: #FFC107;
+  --ttt-accent: #E91E63;
 }
 
 body {
@@ -105,4 +110,109 @@ body {
 .btn-large {
   padding: 12px 24px;
   font-size: 1.1rem;
+}
+
+/* Tic Tac Toe board and UI styles */
+.ttt-container {
+  background: rgba(31, 34, 76, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 2px 16px 0 rgba(36, 72, 140, 0.18);
+  padding: 36px 20px 32px 20px;
+  max-width: 380px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ttt-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(3, 64px);
+  gap: 12px;
+  margin-bottom: 28px;
+  justify-items: center;
+}
+
+.ttt-cell {
+  width: 64px;
+  height: 64px;
+  font-size: 2.2rem;
+  font-family: inherit;
+  color: var(--ttt-primary);
+  background: #fff;
+  border: 2px solid var(--ttt-accent);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.13s, border 0.13s;
+  box-shadow: 0 0.5px 8px 0 rgba(36, 72, 140, 0.10);
+}
+.ttt-cell:disabled {
+  background: #f2f2fb;
+  color: #bbb;
+  cursor: not-allowed;
+}
+.ttt-cell:hover:enabled {
+  border-color: var(--ttt-secondary);
+  background: #fdffe4;
+}
+
+.ttt-status {
+  font-size: 1.18rem;
+  margin-bottom: 12px;
+  color: var(--ttt-primary);
+  font-weight: 600;
+  min-height: 24px;
+}
+
+.ttt-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.ttt-newgame {
+  background: var(--ttt-accent);
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+}
+.ttt-newgame:hover {
+  background: #c2185b;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 480px) {
+  .ttt-container {
+    padding: 16px 5px;
+    max-width: 98vw;
+  }
+  .ttt-board {
+    grid-template-columns: repeat(3, 44px);
+    grid-template-rows: repeat(3, 44px);
+    gap: 8px;
+  }
+  .ttt-cell {
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+  }
+}
+
+/* For centered play area when board is by itself */
+body, .app, main, .container {
+  min-height: 100vh;
 }
