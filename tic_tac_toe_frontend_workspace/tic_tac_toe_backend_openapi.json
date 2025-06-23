@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Tic Tac Toe API",
+    "description": "A Flask API backend for Tic Tac Toe game.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/start": {
+      "post": {
+        "summary": "Start new Tic Tac Toe game",
+        "description": "Initialize a new tic tac toe game.",
+        "operationId": "start_game_tic_tac_toe_start_post",
+        "tags": [
+          "Game"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "player": {
+                    "type": "string",
+                    "description": "Which player starts ('X' or 'O').",
+                    "enum": [
+                      "X",
+                      "O"
+                    ]
+                  }
+                },
+                "required": [
+                  "player"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/move": {
+      "post": {
+        "summary": "Make a move",
+        "description": "Submit a move on the tic tac toe board.",
+        "operationId": "make_move_tic_tac_toe_move_post",
+        "tags": [
+          "Game"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "row": {
+                    "type": "integer"
+                  },
+                  "col": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "row",
+                  "col"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/state": {
+      "get": {
+        "summary": "Get game state",
+        "description": "Get the current state of the game.",
+        "operationId": "state_state_get",
+        "tags": [
+          "Game"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GameState": {
+        "type": "object",
+        "properties": {
+          "board": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "current_player": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "playing",
+              "won",
+              "draw"
+            ]
+          },
+          "winner": {
+            "type": "string",
+            "nullable": true
+          },
+          "msg": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "board",
+          "current_player",
+          "status",
+          "winner",
+          "msg"
+        ]
+      }
+    }
+  }
+}
